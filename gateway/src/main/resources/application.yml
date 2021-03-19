@@ -1,0 +1,18 @@
+server:port=9000
+spring:application:name=GATEWAY-SERVICE
+eureka:
+client:
+serviceUrl:
+defaultZone: http://localhost:8761/eureka/
+spring:
+cloud:
+gateway:
+routes:
+- id: user-service
+uri:http://localhost:8082
+predicates:
+- Path=/users/**
+:discovery:
+  locator:
+  enabled=true
+lowerCaseServiceId=true
