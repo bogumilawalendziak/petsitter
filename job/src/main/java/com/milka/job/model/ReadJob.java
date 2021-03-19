@@ -3,9 +3,6 @@ package com.milka.job.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -14,7 +11,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class WriteJob {
+public class ReadJob {
 
     @Future
     @NotNull
@@ -28,8 +25,6 @@ public class WriteJob {
     @NotBlank
     String city;
     @NotNull
-    long userId;
-    @NotNull
-    Status status;
-    // z góry określić status
+    String employerName;
+
 }

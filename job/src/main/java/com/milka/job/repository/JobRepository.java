@@ -1,6 +1,7 @@
-package com.milka.job;
+package com.milka.job.repository;
 
-import org.springframework.data.domain.Example;
+import com.milka.job.model.Job;
+import com.milka.job.model.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

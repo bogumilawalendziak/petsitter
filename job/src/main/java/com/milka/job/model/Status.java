@@ -1,4 +1,4 @@
-package com.milka.job;
+package com.milka.job.model;
 
 public enum Status {
     SEARCH,

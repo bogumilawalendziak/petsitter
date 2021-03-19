@@ -1,8 +1,9 @@
 package com.milka.users.controller;
 
+import com.milka.users.model.Status;
 import com.milka.users.model.User;
-import com.milka.users.repository.UserRepository;
-import org.springframework.http.HttpStatus;
+import com.milka.users.service.UserService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,72 +13,46 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
+
 
     @PostMapping
     public User addUser(@RequestBody @Valid User user) {
-
-        return userRepository.save(user);
+        return userService.addUser(user);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public List<User> getUsers() {
+    @Cacheable(cacheNames = "users")
+    public List<User> getUsers(@RequestParam(required = false) Status status) {
 
-        return userRepository.findAll();
+        return userService.getUsers(status);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable long id) {
-        return userRepository.findById(id).map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public User getUser(@PathVariable long id) {
+       return userService.getUser(id);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable long id, @RequestBody User user) {
 
-        return userRepository.findById(id).map(
-                dbUser ->
-                {
-                    if (!user.getName().isEmpty()) {
-                        dbUser.setName(user.getName());
-                    }
-                    if (!user.getSurname().isEmpty()) {
-                        dbUser.setSurname(user.getSurname());
-                    }
-                    if (!user.getEmail().isEmpty()) {
-                        dbUser.setEmail(user.getEmail());
-                    }
-                    return ResponseEntity.ok(userRepository.save(user));
-                }).orElse(ResponseEntity.notFound().build());
-
+        if(userService.patchUser(id,user)!=null) {
+            return ResponseEntity.ok().build();
+        }else return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> changeUser(@PathVariable long id, @RequestBody @Valid User user) {
-        return userRepository.findById(id).map(
-                dbUser -> {
-                    dbUser.setName(user.getName());
-                    dbUser.setSurname(user.getSurname());
-                    dbUser.setEmail(user.getEmail());
-                    return ResponseEntity.ok(userRepository.save(user));
-                }).orElseGet(() -> ResponseEntity.notFound().build());
-
-
+    public User changeUser(@PathVariable long id, @RequestBody @Valid User user) {
+        return userService.putUser(id, user);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable long id) {
+    public void deleteUser(@PathVariable long id) {
 
-        return userRepository.findById(id)
-                .map(user -> {
-                    userRepository.delete(user);
-                    return ResponseEntity.ok().build();
-                }).orElse(ResponseEntity.notFound().build());
-
+        userService.softDeleteUser(id);
     }
 }

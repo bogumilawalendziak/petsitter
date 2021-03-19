@@ -1,9 +1,10 @@
-package com.milka.job;
+package com.milka.job.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.milka.job.model.Job;
+import com.milka.job.logic.JobServiceImpl;
+import com.milka.job.model.Status;
+import com.milka.job.model.WriteJob;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,10 +18,23 @@ public class JobController {
         this.jobService = jobService;
     }
 
-
     @GetMapping
     public List<Job> getJobs(@RequestParam Status status){
         return jobService.getJobs(status);
+    }
+
+    @GetMapping("/{id}")
+    public Job getJobById(@PathVariable long id){
+        return jobService.getJob(id);
+    }
+
+    @PostMapping
+    public Job addJob(@RequestBody WriteJob toSave){
+       return jobService.addJob(toSave);
+    }
+
+    public void takeJob(@RequestParam long petsitterId, long employerId){
+        jobService.takeJob(petsitterId,employerId);
     }
 
 }
